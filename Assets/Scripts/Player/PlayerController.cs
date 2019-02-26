@@ -57,6 +57,7 @@ namespace Sierra.AGPW.TenSecondAscencion
         public void TriggerInputHorizontal(float input) => _inputHor = input;
         public void TriggerInputVertical(float input) => _inputVert = input;
 
+        private bool _canJump = true;
         private bool _inputThrow = false;
         private bool _inputJump = false;
         private bool _inputJumpHeld = false;
@@ -108,6 +109,8 @@ namespace Sierra.AGPW.TenSecondAscencion
             if (IsGrounded())
             {
                 if (_motionVectorCont.y < 0f) _motionVectorCont.y = -0.5f;
+
+                _canJump = true;
             }
             // If not falling faster than max falling speed
             else if (_motionVectorCont.y > -_gravityStrengthMax)
@@ -129,6 +132,8 @@ namespace Sierra.AGPW.TenSecondAscencion
                     Debug.Log("Held");
                     _motionVectorCont.y -= _gravityStrengthCurrent;
                 }
+
+                _canJump = false;
             }
 
         }
@@ -236,7 +241,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                 case PlayerState.Standing:
                     // Adjust motion vector
                     _motionVectorInput.x = _inputHor;
-                    if (_inputJump)
+                    if (_canJump && _inputJump)
                     {
                         _motionVectorCont.y = _jumpStrength;
                     }
