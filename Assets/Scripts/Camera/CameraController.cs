@@ -39,6 +39,6 @@ namespace Sierra.AGPW
         public float ZoomSpeed = 0.25f;
 
         private Camera _cam;
-        private float _distance;
+        private float _distance = -15f;
     }
 }
