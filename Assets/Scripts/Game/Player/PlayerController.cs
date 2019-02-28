@@ -226,7 +226,8 @@ namespace Sierra.AGPW.TenSecondAscencion
             {
                 case PlayerState.Normal:
                     // Check inputs
-                    DoMotionStanding();
+                    DoMotionHorizontal();
+                    DoMotionJump();
 
                     if (_holdingPlayer) DoThrow();
                     else DoGrab();
@@ -235,7 +236,28 @@ namespace Sierra.AGPW.TenSecondAscencion
                     UpdatePosition();
                     break;
 
+                case PlayerState.Launched:
+                    // Revert state upon landing
+                    if (IsGrounded()) _state = PlayerState.Normal;
+
+                    // Apply motion
+                    UpdatePosition();
+                    break;
+
                 case PlayerState.Climbing:
+                    // Disable gravity while climbing to allow upward movement
+                    _gravityEnabled = false;
+                    _motionVectorCont = Vector2.zero;
+
+                    // Check movement Inputs
+                    DoMotionClimb();
+                    DoMotionHorizontal();
+
+                    // Apply Motion
+                    UpdatePosition();
+
+                    // Reset
+                    _touchingWall = false;
                     break;
 
                 case PlayerState.Assisting:
@@ -250,10 +272,13 @@ namespace Sierra.AGPW.TenSecondAscencion
 
             ResetInputVars();
         }
-        private void DoMotionStanding()
+        private void DoMotionHorizontal()
         {
             _motionVectorInput.x = _inputHor;
             Sign = _inputHor < 0 ? (int)Math.Floor(_inputHor) : (int)Math.Ceiling(_inputHor);
+        }
+        private void DoMotionJump()
+        {
             if (_canJump && _inputJump)
             {
                 _motionVectorCont.y = _jumpStrength;
@@ -279,27 +304,57 @@ namespace Sierra.AGPW.TenSecondAscencion
         #endregion
 
         #region MECHANIC VARIABLES
+        private int _wallDir;
+        private bool _touchingWall;
+
         private GrabBox _grabBox;
-        private Transform _carryPos;
         private PlayerController _heldPlayer;
+        private Transform _carryPos;
+
+        [SerializeField]
+        private Vector2 _launchTrajectory = new Vector2(35f, 40f);
         #endregion
         #region MECHANIC METHODS
         public void Hold()
         {
             _state = PlayerState.Held;
         }
-        public void Launch(Vector2 dir)
+        public void Launch(Vector2 trajectory)
         {
-            _state = PlayerState.Normal;
+            _state = PlayerState.Launched;
             Debug.Log("vWHOOSH");
+
+            _motionVectorCont = trajectory;
+        }
+        public void TriggerWallTouch(int dir)
+        {
+            _state = PlayerState.Climbing;
+            _touchingWall = true;
+            if (dir != 0) _wallDir = Mathf.Clamp(dir, -1, 1);
+        }
+
+        private void DoMotionClimb()
+        {
+            if (_touchingWall && 
+                (
+                _wallDir == -1 && _inputHor <= -0.3f ||
+                _wallDir == 1 && _inputHor >= 0.3f
+                ))
+            {
+                _motionVectorInput.y = 1;
+            }
+            else
+            {
+                // revert to normal state if not touching or not inputting
+                _state = PlayerState.Normal;
+                _gravityEnabled = true;
+            }
         }
         private void DoGrab()
         {
             if (_inputThrow)
             {
                 var otherPlayer = _grabBox.GrabPlayer();
-                Debug.Log(otherPlayer != null ? otherPlayer.name : "nothing");
-
                 if (otherPlayer == null) return;
 
                 otherPlayer.Hold();
@@ -313,7 +368,11 @@ namespace Sierra.AGPW.TenSecondAscencion
             {
                 if (_heldPlayer == null) return;
 
-                _heldPlayer.Launch(Vector2.one);
+                _heldPlayer.Launch(
+                    new Vector2(
+                        Sign * _launchTrajectory.x,
+                        _launchTrajectory.y
+                        ));
                 _holdingPlayer = false;
                 _heldPlayer = null;
             }
@@ -335,7 +394,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                 // Cast ray downward on left side
                 Physics2D.Raycast(
                     new Vector2(
-                        _col.bounds.center.x - _col.bounds.extents.x,
+                        _col.bounds.center.x - _col.bounds.extents.x + 0.1f,
                         _col.bounds.center.y - _col.bounds.extents.y
                         ),
                     Vector2.down,
@@ -345,7 +404,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                 // Cast ray downward on right side
                 Physics2D.Raycast(
                     new Vector2(
-                        _col.bounds.center.x + _col.bounds.extents.x,
+                        _col.bounds.center.x + _col.bounds.extents.x - 0.1f,
                         _col.bounds.center.y - _col.bounds.extents.y
                         ),
                     Vector2.down,
