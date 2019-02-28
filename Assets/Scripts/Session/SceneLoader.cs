@@ -13,5 +13,6 @@ public enum SceneName
     MenuModeSelect = 1,
     MenuGameOver = 2,
     MenuSettings = 3,
-    LevelUntimedTest = 4
+    LevelUntimedTest = 4,
+    LevelHighscore = 5
 }

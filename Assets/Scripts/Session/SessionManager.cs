@@ -33,12 +33,13 @@ public class SessionManager : MonoBehaviour
     private void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
     {
         // Check if in a playable level
-        if (scene.name == "LevelUntimedTest")
+        if (scene.name == "LevelUntimedTest" ||
+            scene.name == "LevelHighscore")
         {
             LevelManager.StartLevel();
         }
     }
-    private void OnLevelEnd(float score)
+    private void OnLevelEnd(int score)
     {
         LevelManager.OnLevelEnd -= OnLevelEnd;
 

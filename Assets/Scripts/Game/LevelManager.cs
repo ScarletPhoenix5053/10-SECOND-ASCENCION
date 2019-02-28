@@ -18,17 +18,17 @@ public class LevelManager : MonoBehaviour
     // EVENTS
     public delegate void LevelStartHandler();
     public static event LevelStartHandler OnLevelStart;
-    public delegate void LevelEndHandler(float score);
+    public delegate void LevelEndHandler(int score);
     public static event LevelEndHandler OnLevelEnd;
     #endregion
 
     #region Unity Messages
-    private void Awake()
+    protected virtual void Awake()
     {
         OnLevelStart += SetupLevel;        
         OnLevelEnd += UnsubscribeFromEvents;
     }
-    private void Update()
+    protected virtual void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -45,15 +45,23 @@ public class LevelManager : MonoBehaviour
     }
     public static void EndLevel()
     {
-        OnLevelEnd?.Invoke(0);
+        OnLevelEnd?.Invoke(FindObjectOfType<LevelManager>().GetScore());
+    }
+    public int GetScore()
+    {
+        var p1Score = (int)Mathf.Ceil(Player1.transform.position.y * 100);
+        var p2Score = (int)Mathf.Ceil(Player2.transform.position.y * 100);
+        var highest = Mathf.Max(p1Score, p2Score);
+
+        return highest > 0 ? highest : 0;
     }
     #endregion
     #region Private Methods
-    private void SetupLevel()
+    protected void SetupLevel()
     {
         Player1.transform.position = new Vector3(Player1Pos.x, Player1.transform.position.y, Player1Pos.z);
     }
-    private void UnsubscribeFromEvents(float score)
+    protected void UnsubscribeFromEvents(int score)
     {
         OnLevelStart -= SetupLevel;
         OnLevelEnd -= UnsubscribeFromEvents;

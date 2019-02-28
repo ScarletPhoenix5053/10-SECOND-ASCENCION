@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LevelUntimedTest.unity
     guid: cd4ba44b5aa464940b8c5bb95f262433
+  - enabled: 1
+    path: Assets/Scenes/LevelHighscore.unity
+    guid: 0bac882084686fd43b4a528b3c2f23b4
   m_configObjects: {}
