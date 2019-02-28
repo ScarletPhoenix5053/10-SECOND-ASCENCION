@@ -9,21 +9,25 @@ namespace Sierra.AGPW.TenSecondAscencion
     {
         private void Awake()
         {
+            // Assign from self
             _rb = GetComponent<Rigidbody2D>();
             _col = GetComponent<Collider2D>() as CapsuleCollider2D;
 
-            if (!_gravityEnabledDefault) _gravityEnabled = false;
-            
-        }
-        private void Update()
-        {
+            // Assign from children
+            _grabBox = GetComponentInChildren<GrabBox>();
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform child = transform.GetChild(i);
+                if (child.tag == "CarryPos") _carryPos = child;
+            }
+
+            if (!_gravityEnabledDefault) _gravityEnabled = false;            
         }
         private void FixedUpdate()
         {
             Act();
+            UpdateHeldPlayerPos();
         }
-
-
 
 
         #region MOVEMENT VARIABLES
@@ -50,54 +54,6 @@ namespace Sierra.AGPW.TenSecondAscencion
         private CapsuleCollider2D _col;
         private Rigidbody2D _rb;
         #endregion
-        #region INPUT VARIABLES
-        public void TriggerInputThrow() => _inputThrow = true;
-        public void TriggerInputJump() => _inputJump = true;        
-        public void TriggerInputJumpHeld() => _inputJumpHeld = true;        
-        public void TriggerInputHorizontal(float input) => _inputHor = input;
-        public void TriggerInputVertical(float input) => _inputVert = input;
-
-        private bool _canJump = true;
-        private bool _inputThrow = false;
-        private bool _inputJump = false;
-        private bool _inputJumpHeld = false;
-        private float _inputHor = 0;
-        private float _inputVert = 0;
-
-        private bool _isThrowing = false;
-        private PlayerState _state = PlayerState.Standing;
-        #endregion
-
-        public LayerMask GroundMask;
-        /// <summary>
-        /// True if touching the ground.
-        /// </summary>
-        public bool IsGrounded()
-        {
-            return
-                // Cast ray downward on left side
-                Physics2D.Raycast(
-                    new Vector2(
-                        _col.bounds.center.x - _col.bounds.extents.x,
-                        _col.bounds.center.y - _col.bounds.extents.y
-                        ),
-                    Vector2.down,
-                    _groundingBuffer,
-                    GroundMask)
-            ||
-                // Cast ray downward on right side
-                Physics2D.Raycast(
-                    new Vector2(
-                        _col.bounds.center.x + _col.bounds.extents.x,
-                        _col.bounds.center.y - _col.bounds.extents.y
-                        ),
-                    Vector2.down,
-                    _groundingBuffer,
-                    GroundMask);
-
-            // Returns true if either ray hits the ground
-        }
-
         #region MOVEMENT METHODS
         /// <summary>
         /// Applies an accelerating downward force whenver the player is airborne.
@@ -230,18 +186,50 @@ namespace Sierra.AGPW.TenSecondAscencion
             ResetImpulse();
         }
         #endregion
-        #region INPUT METHODS
+
+        #region INPUT & MOTION VARIABLES
+        // Calling these trigger methods switches the related bool to true.
+        // This bool is reset each frame, thus making it function as a trigger.
+        public void TriggerInputThrow() => _inputThrow = true;
+        public void TriggerInputJump() => _inputJump = true;        
+        public void TriggerInputJumpHeld() => _inputJumpHeld = true;        
+        public void TriggerInputHorizontal(float input) => _inputHor = input;
+        public void TriggerInputVertical(float input) => _inputVert = input;
+
+        private bool _canJump = true;
+        private bool _holdingPlayer = false;
+        private Vector3 _heldPlayerPos = new Vector2(-1, 1);
+
+        private bool _inputThrow = false;
+        private bool _inputJump = false;
+        private bool _inputJumpHeld = false;
+        private float _inputHor = 0;
+        private float _inputVert = 0;
+
+        public int Sign
+        {
+            get { return _sign; }
+            set { if (value != 0)  _sign = Mathf.Clamp(value, -1, 1); }
+        }
+        private int _sign = 1;
+
+        private PlayerState _state = PlayerState.Normal;
+        [SerializeField]
+        private LayerMask GroundMask;
+        #endregion
+        #region INPUT & MOTION METHODS
         private void Act()
         {
+            FaceSign();
+
             switch (_state)
             {
-                case PlayerState.Standing:
-                    // Adjust motion vector
-                    _motionVectorInput.x = _inputHor;
-                    if (_canJump && _inputJump)
-                    {
-                        _motionVectorCont.y = _jumpStrength;
-                    }
+                case PlayerState.Normal:
+                    // Check inputs
+                    DoMotionStanding();
+
+                    if (_holdingPlayer) DoThrow();
+                    else DoGrab();
 
                     // Apply motion
                     UpdatePosition();
@@ -250,10 +238,10 @@ namespace Sierra.AGPW.TenSecondAscencion
                 case PlayerState.Climbing:
                     break;
 
-                case PlayerState.PullingTeammateUp:
+                case PlayerState.Assisting:
                     break;
 
-                case PlayerState.BeingPulledUp:
+                case PlayerState.Held:
                     break;
 
                 default:
@@ -261,6 +249,15 @@ namespace Sierra.AGPW.TenSecondAscencion
             }
 
             ResetInputVars();
+        }
+        private void DoMotionStanding()
+        {
+            _motionVectorInput.x = _inputHor;
+            Sign = _inputHor < 0 ? (int)Math.Floor(_inputHor) : (int)Math.Ceiling(_inputHor);
+            if (_canJump && _inputJump)
+            {
+                _motionVectorCont.y = _jumpStrength;
+            }
         }
         private void ResetInputVars()
         {
@@ -270,13 +267,101 @@ namespace Sierra.AGPW.TenSecondAscencion
             _inputHor = 0;
             _inputVert = 0;
         }
+        private void FaceSign()
+        {
+            transform.localScale =
+                new Vector3(
+                    Sign,
+                    transform.localScale.y,
+                    transform.localScale.z
+                    );
+        }
         #endregion
+
+        #region MECHANIC VARIABLES
+        private GrabBox _grabBox;
+        private Transform _carryPos;
+        private PlayerController _heldPlayer;
+        #endregion
+        #region MECHANIC METHODS
+        public void Hold()
+        {
+            _state = PlayerState.Held;
+        }
+        public void Launch(Vector2 dir)
+        {
+            _state = PlayerState.Normal;
+            Debug.Log("vWHOOSH");
+        }
+        private void DoGrab()
+        {
+            if (_inputThrow)
+            {
+                var otherPlayer = _grabBox.GrabPlayer();
+                Debug.Log(otherPlayer != null ? otherPlayer.name : "nothing");
+
+                if (otherPlayer == null) return;
+
+                otherPlayer.Hold();
+                _heldPlayer = otherPlayer;
+                _holdingPlayer = true;
+            }
+        }
+        private void DoThrow()
+        {
+            if (_inputThrow)
+            {
+                if (_heldPlayer == null) return;
+
+                _heldPlayer.Launch(Vector2.one);
+                _holdingPlayer = false;
+                _heldPlayer = null;
+            }
+        }
+        private void UpdateHeldPlayerPos()
+        {
+            if (_heldPlayer == null) return;
+
+            _heldPlayer.transform.position = _carryPos.position;
+        }
+        #endregion
+
+        /// <summary>
+        /// True if touching the ground.
+        /// </summary>
+        public bool IsGrounded()
+        {
+            return
+                // Cast ray downward on left side
+                Physics2D.Raycast(
+                    new Vector2(
+                        _col.bounds.center.x - _col.bounds.extents.x,
+                        _col.bounds.center.y - _col.bounds.extents.y
+                        ),
+                    Vector2.down,
+                    _groundingBuffer,
+                    GroundMask)
+            ||
+                // Cast ray downward on right side
+                Physics2D.Raycast(
+                    new Vector2(
+                        _col.bounds.center.x + _col.bounds.extents.x,
+                        _col.bounds.center.y - _col.bounds.extents.y
+                        ),
+                    Vector2.down,
+                    _groundingBuffer,
+                    GroundMask);
+
+            // Returns true if either ray hits the ground
+        }
+        
     }
     internal enum PlayerState
     {
-        Standing,
+        Normal,
+        Launched,
         Climbing,
-        PullingTeammateUp,
-        BeingPulledUp
+        Assisting,
+        Held
     }
 }

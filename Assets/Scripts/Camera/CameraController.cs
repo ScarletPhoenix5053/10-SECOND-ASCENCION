@@ -22,12 +22,12 @@ namespace Sierra.AGPW
             
             if (frustumWidth - MinDistFromFustrum*2 < GetDistance())
             {
-                Debug.Log("Too Far");
+                //Debug.Log("Too Far");
                 transform.position -= new Vector3(0, 0, ZoomSpeed);
             }
             else if (frustumWidth - MaxDistFromFustrum * 2 > GetDistance())
             {
-                Debug.Log("Too Close");
+                //Debug.Log("Too Close");
                 transform.position += new Vector3(0, 0, ZoomSpeed);
             }
 

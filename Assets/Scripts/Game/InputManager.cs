@@ -59,6 +59,10 @@ namespace Sierra.AGPW.TenSecondAscencion
             {
                 player.TriggerInputJumpHeld();
             }
+            if (inputGroup.GetThrow())
+            {
+                player.TriggerInputThrow();
+            }
             if (inputGroup.GetMotionHorizontal() <= -0.1 ||
                 inputGroup.GetMotionHorizontal() >= 0.1)
             {
@@ -105,7 +109,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                 _axisLeftStickX = "Joystick" + controllerIndex + "LeftStickX";
                 _axisLeftStickY = "Joystick" + controllerIndex + "LeftStickY";
 
-                _keyThrow = (KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + controllerIndex + "Button3");
+                _keyThrow = (KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + controllerIndex + "Button2");
                 _keyJump = (KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + controllerIndex + "Button0");
                 /*
                 Debug.Log("Assigning _keyThrow as " + _keyThrow);
@@ -125,7 +129,7 @@ namespace Sierra.AGPW.TenSecondAscencion
 
         public bool GetJump() => Input.GetKeyDown(_keyJump);
         public bool GetJumpHeld() => Input.GetKey(_keyJump);
-        public bool GetThrow() => Input.GetKey(_keyThrow);
+        public bool GetThrow() => Input.GetKeyDown(_keyThrow);
 
         public float GetMotionHorizontal()
         {
