@@ -7,7 +7,8 @@ namespace Sierra.AGPW.TenSecondAscencion
     {
         private void Awake()
         {
-            ControllerInputAll = new ControllerInputGroup(PlayerOneControllerIndex);
+            ControllerInput1 = new ControllerInputGroup(Player1ControllerIndex);
+            ControllerInput2 = new ControllerInputGroup(Player2ControllerIndex);
         }
         private void Start()
         {
@@ -15,22 +16,8 @@ namespace Sierra.AGPW.TenSecondAscencion
         }
         private void Update()
         {
-            if (ControllerInputAll.GetJump())
-            {
-                PlayerOne.TriggerInputJump();
-            }
-            if (ControllerInputAll.GetJumpHeld())
-            {
-                PlayerOne.TriggerInputJumpHeld();
-            }
-            if (ControllerInputAll.GetMotionHorizontal() <= -0.1 ||
-                ControllerInputAll.GetMotionHorizontal() >= 0.1)
-            {
-                PlayerOne.TriggerInputHorizontal(
-                    Mathf.Sign(
-                        ControllerInputAll.GetMotionHorizontal()
-                        ));
-            }
+            CheckControlsFor(Player1, ControllerInput1);
+            CheckControlsFor(Player2, ControllerInput2);
 
             Array values = Enum.GetValues(typeof(KeyCode));
             foreach (KeyCode code in values)
@@ -39,12 +26,14 @@ namespace Sierra.AGPW.TenSecondAscencion
             }
         }
 
-        public PlayerController PlayerOne;
-        public int PlayerOneControllerIndex;
-        public PlayerController PlayerTwo;
-        public int PlayerTwoControllerIndex = 2;
+        public PlayerController Player1;
+        public int Player1ControllerIndex = 1;
 
-        private ControllerInputGroup ControllerInputAll;
+        public PlayerController Player2;
+        public int Player2ControllerIndex = 2;
+
+        private ControllerInputGroup ControllerInput1;
+        private ControllerInputGroup ControllerInput2;
 
         private void LogControllerCountAndNames()
         {
@@ -54,6 +43,25 @@ namespace Sierra.AGPW.TenSecondAscencion
             foreach (string pad in padNames)
             {
                 Debug.Log(pad);
+            }
+        }
+        private void CheckControlsFor(PlayerController player, IInputGroup inputGroup)
+        {
+            if (inputGroup.GetJump())
+            {
+                player.TriggerInputJump();
+            }
+            if (inputGroup.GetJumpHeld())
+            {
+                player.TriggerInputJumpHeld();
+            }
+            if (inputGroup.GetMotionHorizontal() <= -0.1 ||
+                inputGroup.GetMotionHorizontal() >= 0.1)
+            {
+                player.TriggerInputHorizontal(
+                    Mathf.Sign(
+                        inputGroup.GetMotionHorizontal()
+                        ));
             }
         }
     }
@@ -118,7 +126,6 @@ namespace Sierra.AGPW.TenSecondAscencion
         public float GetMotionHorizontal()
         {
             var motion = Input.GetAxisRaw(_axisLeftStickX);
-            Debug.Log(motion);
             return motion;         
         }
         public float GetMotionVertical()

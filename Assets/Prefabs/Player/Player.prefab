@@ -130,8 +130,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _drag: 0.5
+  _fallMultiplier: 2.5
+  _lowJumpMultiplier: 2.5
+  _jumpStrength: 16
   _gravityStrengthMax: 20
-  _gravityStrengthCurrent: 0.8
+  _gravityStrengthCurrent: 1.2
   _speed: 10
   GroundMask:
     serializedVersion: 2
