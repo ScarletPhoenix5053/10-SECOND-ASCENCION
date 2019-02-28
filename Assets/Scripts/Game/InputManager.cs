@@ -19,11 +19,7 @@ namespace Sierra.AGPW.TenSecondAscencion
             CheckControlsFor(Player1, ControllerInput1);
             CheckControlsFor(Player2, ControllerInput2);
 
-            Array values = Enum.GetValues(typeof(KeyCode));
-            foreach (KeyCode code in values)
-            {
-                if (Input.GetKeyDown(code)) { print(Enum.GetName(typeof(KeyCode), code)); }
-            }
+            //LogAllKeyPresses()
         }
 
         public PlayerController Player1;
@@ -43,6 +39,14 @@ namespace Sierra.AGPW.TenSecondAscencion
             foreach (string pad in padNames)
             {
                 Debug.Log(pad);
+            }
+        }
+        private void LogAllKeyPresses()
+        {
+            Array values = Enum.GetValues(typeof(KeyCode));
+            foreach (KeyCode code in values)
+            {
+                if (Input.GetKeyDown(code)) { print(Enum.GetName(typeof(KeyCode), code)); }
             }
         }
         private void CheckControlsFor(PlayerController player, IInputGroup inputGroup)
