@@ -118,18 +118,15 @@ namespace Sierra.AGPW.TenSecondAscencion
                 // ...and is actually falling, not rising
                 if (_motionVectorCont.y < 0)
                 {
-                    Debug.Log("Fall");
                     _motionVectorCont.y -= _gravityStrengthCurrent * _fallMultiplier;
                 }
                 // ...otherwise must be rising
                 else if (_motionVectorCont.y > 0 && !_inputJumpHeld)
                 {
-                    Debug.Log("Rise");
                     _motionVectorCont.y -= _gravityStrengthCurrent * _lowJumpMultiplier;
                 }
                 else
                 {
-                    Debug.Log("Held");
                     _motionVectorCont.y -= _gravityStrengthCurrent;
                 }
 

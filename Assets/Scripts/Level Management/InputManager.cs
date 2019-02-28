@@ -1,33 +1,59 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace Sierra.AGPW.TenSecondAscencion
 {
     public class InputManager : MonoBehaviour
     {
-        public PlayerController PlayerOne;
-        public PlayerController PlayerTwo;
-
-        private ControllerInputGroup ControllerOneInput = new ControllerInputGroup(KeyCode3)
-
+        private void Awake()
+        {
+            ControllerInputAll = new ControllerInputGroup(PlayerOneControllerIndex);
+        }
+        private void Start()
+        {
+            LogControllerCountAndNames();
+        }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (ControllerInputAll.GetJump())
             {
                 PlayerOne.TriggerInputJump();
             }
-            if (Input.GetKey(KeyCode.Space))
+            if (ControllerInputAll.GetJumpHeld())
             {
                 PlayerOne.TriggerInputJumpHeld();
             }
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+            if (ControllerInputAll.GetMotionHorizontal() <= -0.1 ||
+                ControllerInputAll.GetMotionHorizontal() >= 0.1)
             {
-                var input = 0f;
-                if (Input.GetKey(KeyCode.A)) input -= 1;
-                if (Input.GetKey(KeyCode.D)) input += 1;
+                PlayerOne.TriggerInputHorizontal(
+                    Mathf.Sign(
+                        ControllerInputAll.GetMotionHorizontal()
+                        ));
+            }
 
-                PlayerOne.TriggerInputHorizontal(input);
+            Array values = Enum.GetValues(typeof(KeyCode));
+            foreach (KeyCode code in values)
+            {
+                if (Input.GetKeyDown(code)) { print(Enum.GetName(typeof(KeyCode), code)); }
+            }
+        }
+
+        public PlayerController PlayerOne;
+        public int PlayerOneControllerIndex;
+        public PlayerController PlayerTwo;
+        public int PlayerTwoControllerIndex = 2;
+
+        private ControllerInputGroup ControllerInputAll;
+
+        private void LogControllerCountAndNames()
+        {
+            var padNames = Input.GetJoystickNames();
+
+            Debug.Log("Found " + padNames.Length + " controllers");
+            foreach (string pad in padNames)
+            {
+                Debug.Log(pad);
             }
         }
     }
@@ -48,14 +74,42 @@ namespace Sierra.AGPW.TenSecondAscencion
     }
     public struct ControllerInputGroup : IInputGroup
     {
-        public ControllerInputGroup(KeyCode keyJump, KeyCode keyThrow)
+        /// <summary>
+        /// Instantiate a ControllerInputGroup which uses the controller at the specified index.
+        /// </summary>
+        /// <param name="controllerNum">An integer from 0-4. Speciifes which controller to read input from. Check all controllers if 0 is passed.</param>
+        public ControllerInputGroup(int controllerIndex)
         {
-            _keyThrow = keyJump;
-            _keyJump = keyThrow;
+            if (controllerIndex == 0)
+            {
+                _axisLeftStickX = "JoystickAnyLeftStickX";
+                _axisLeftStickY = "JoystickAnyLeftStickY";
+
+                _keyThrow = KeyCode.JoystickButton3;
+                _keyJump = KeyCode.JoystickButton0;
+            }
+            else if (controllerIndex > 0 && controllerIndex <= 4)
+            {
+                _axisLeftStickX = "Joystick" + controllerIndex + "LeftStickX";
+                _axisLeftStickY = "Joystick" + controllerIndex + "LeftStickY";
+
+                _keyThrow = (KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + controllerIndex + "Button3");
+                _keyJump = (KeyCode)Enum.Parse(typeof(KeyCode), "Joystick" + controllerIndex + "Button0");
+                /*
+                Debug.Log("Assigning _keyThrow as " + _keyThrow);
+                Debug.Log("Assigning _keyJump as " + _keyJump);
+                */
+            }
+            else
+            {
+                throw new ArgumentException("This index must be an integer between 0 and 4.", "controllerIndex");
+            }
         }
 
-        private KeyCode _keyThrow;
-        private KeyCode _keyJump;
+        private readonly KeyCode _keyThrow;
+        private readonly KeyCode _keyJump;
+        private readonly string _axisLeftStickX;
+        private readonly string _axisLeftStickY;
 
         public bool GetJump() => Input.GetKeyDown(_keyJump);
         public bool GetJumpHeld() => Input.GetKey(_keyJump);
@@ -63,16 +117,18 @@ namespace Sierra.AGPW.TenSecondAscencion
 
         public float GetMotionHorizontal()
         {
-            return Input.GetAxisRaw("Horizontal");
+            var motion = Input.GetAxisRaw(_axisLeftStickX);
+            Debug.Log(motion);
+            return motion;         
         }
         public float GetMotionVertical()
         {
-            return Input.GetAxisRaw("Vertical");
+            return Input.GetAxisRaw(_axisLeftStickY);
         }
 
         public Vector2 GetAimDir()
         {
-            return new Vector2(Input.GetAxis("AimHor"), Input.GetAxis("AimVert")); 
+            throw new NotImplementedException("Aim axis support is not implimented.");
         }
     }
 }

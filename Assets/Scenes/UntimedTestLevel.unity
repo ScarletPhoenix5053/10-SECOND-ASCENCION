@@ -600,7 +600,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aed5ff8819a541a468dafd85d1edac13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 3210053885495126429}
+  PlayerOne: {fileID: 3210053885495126429}
+  PlayerOneControllerIndex: 2
+  PlayerTwo: {fileID: 0}
+  PlayerTwoControllerIndex: 2
 --- !u!1 &1144656151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,31 +1099,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
-        type: 3}
-      propertyPath: _jumpStrength
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
-        type: 3}
-      propertyPath: _gravityStrengthCurrent
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
-        type: 3}
-      propertyPath: _lowJumpMultiplier
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
-        type: 3}
-      propertyPath: _fallMultiplier
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 9170762824849822328, guid: ba8c44793c8e9cc459507d968dddefd0,
-        type: 3}
-      propertyPath: m_Constraints
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 3210053885495126428, guid: ba8c44793c8e9cc459507d968dddefd0,
         type: 3}
       propertyPath: m_Name
@@ -1180,6 +1158,31 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
+        type: 3}
+      propertyPath: _jumpStrength
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
+        type: 3}
+      propertyPath: _gravityStrengthCurrent
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
+        type: 3}
+      propertyPath: _lowJumpMultiplier
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1102374076942736839, guid: ba8c44793c8e9cc459507d968dddefd0,
+        type: 3}
+      propertyPath: _fallMultiplier
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9170762824849822328, guid: ba8c44793c8e9cc459507d968dddefd0,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ba8c44793c8e9cc459507d968dddefd0, type: 3}
