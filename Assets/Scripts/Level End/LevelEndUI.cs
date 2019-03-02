@@ -1,13 +1,48 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System;
 
-public class LevelEndUI : MonoBehaviour
+namespace Sierra.AGPW.TenSecondAscencion
 {
-    public void OnRetstartButtonPressed()
+    public class LevelEndUI : MonoBehaviour
     {
-        SceneLoader.LoadScene(SceneName.LevelUntimedTest);
-    }
-    public void OnMenuButtonPressed()
-    {
-        SceneLoader.LoadScene(SceneName.MenuMain);
+        private void Awake()
+        {
+            if (_scoreDisplay == null)
+            {
+                Debug.LogWarning("Score display is never set in " + name + ", and" +
+                    " it will never be updated.");
+            }
+        }
+
+        private float _score= 0;
+        [SerializeField]
+        private Text _scoreDisplay;
+
+        public void OnRetstartButtonPressed()
+        {
+            SceneLoader.LoadScene(SceneName.LevelUntimedTest);
+        }
+        public void OnMenuButtonPressed()
+        {
+            SceneLoader.LoadScene(SceneName.MenuMain);
+        }
+        public void DoNewHighscorePrompt()
+        {
+            throw new NotImplementedException();
+        }
+        public void OnSaveNewHighscore()
+        {
+            throw new NotImplementedException();
+        }
+        public void SetScore(float newScore)
+        {
+            _score = newScore;       
+            
+            if (_scoreDisplay != null)
+            {
+                _scoreDisplay.text = _score.ToString();
+            }
+        }
     }
 }
