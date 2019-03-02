@@ -22,13 +22,20 @@ public class LevelEditor : Editor
             window.Show();
         }
 
+        if (GUILayout.Button("Regenerate Level"))
+        {
+            levelConstructor.GenerateLevel();
+            levelConstructor.GenerateLevel();
+            levelConstructor.GenerateLevel();
+            levelConstructor.GenerateLevel();
+        }
+
         if (GUILayout.Button("Reset Tiles"))
         {
             levelConstructor.ResetTiles();
         }
     }
 }
-
 public class LevelEditorWindow : EditorWindow
 {
     private GUIStyle _tileEditorStyle;
@@ -73,16 +80,18 @@ public class LevelEditorWindow : EditorWindow
                     {
                         _levelConstructor.SetTile(x, y, TileType.Terrain);
                     }
-                    _levelConstructor.GenerateLevel();
-                    _levelConstructor.GenerateLevel();
-                    _levelConstructor.GenerateLevel();
-                    _levelConstructor.GenerateLevel();
                 }
             }
             GUILayout.EndVertical();
         }
         GUILayout.EndHorizontal();
         GUILayout.EndScrollView();
+
+
+        _levelConstructor.GenerateLevel();
+        _levelConstructor.GenerateLevel();
+        _levelConstructor.GenerateLevel();
+        _levelConstructor.GenerateLevel();
     }
 
     private LevelConstructor _levelConstructor;

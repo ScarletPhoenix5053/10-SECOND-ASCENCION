@@ -86,6 +86,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                     _motionVectorCont.y -= _gravityStrengthCurrent;
                 }
 
+                Debug.Log("Inair");
                 _canJump = false;
             }
 
