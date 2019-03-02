@@ -86,7 +86,6 @@ namespace Sierra.AGPW.TenSecondAscencion
                     _motionVectorCont.y -= _gravityStrengthCurrent;
                 }
 
-                Debug.Log("Inair");
                 _canJump = false;
             }
 
@@ -241,6 +240,9 @@ namespace Sierra.AGPW.TenSecondAscencion
                     // Revert state upon landing
                     if (IsGrounded()) _state = PlayerState.Normal;
 
+                    // Allow air control
+                    DoMotionHorizontal();
+
                     // Apply motion
                     UpdatePosition();
                     break;
@@ -260,10 +262,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                     // Reset
                     _touchingWall = false;
                     break;
-
-                case PlayerState.Assisting:
-                    break;
-
+                    
                 case PlayerState.Held:
                     break;
 
@@ -421,7 +420,6 @@ namespace Sierra.AGPW.TenSecondAscencion
         Normal,
         Launched,
         Climbing,
-        Assisting,
         Held
     }
 }

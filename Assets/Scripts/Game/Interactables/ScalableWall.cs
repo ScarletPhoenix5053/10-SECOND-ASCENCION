@@ -21,7 +21,6 @@ namespace Sierra.AGPW.TenSecondAscencion
             var player = collision.GetComponent<PlayerController>();
             if (player == null) return;
 
-            Debug.Log("PLAYER");
             var dir = transform.position - player.transform.position;
             var dirInt = dir.x < 0 ? (int)Math.Floor(dir.x) : (int)Math.Ceiling(dir.x);
             player.TriggerWallTouch(dirInt);
