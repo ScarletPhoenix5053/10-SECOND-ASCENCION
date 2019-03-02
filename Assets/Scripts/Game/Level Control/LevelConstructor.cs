@@ -10,13 +10,9 @@ namespace Sierra.AGPW.TenSecondAscencion
         protected void Awake()
         {
             // Initialize tilespace
-            _gameTiles = new TileType[_levelSizeX, _levelSizeY];
-            _gameTiles[5, 12] = TileType.Terrain; _gameTiles[6, 12] = TileType.Terrain; _gameTiles[7, 12] = TileType.Terrain;
-            _gameTiles[5, 13] = TileType.Terrain; _gameTiles[6, 13] = TileType.Terrain; _gameTiles[7, 13] = TileType.Terrain;
-            _gameTiles[5, 14] = TileType.Terrain; _gameTiles[6, 14] = TileType.Terrain; _gameTiles[7, 14] = TileType.Terrain; _gameTiles[8, 14] = TileType.Terrain; _gameTiles[9, 14] = TileType.Terrain;
-            _gameTiles[5, 15] = TileType.Terrain; _gameTiles[6, 15] = TileType.Terrain; _gameTiles[7, 15] = TileType.Terrain;
+            //ResetTiles();
 
-            GenerateLevel();
+            //GenerateLevel();
         }
 
         [SerializeField]
@@ -25,11 +21,27 @@ namespace Sierra.AGPW.TenSecondAscencion
         private int _levelSizeY = 40;
         [SerializeField]
         private Transform _instanceParent;
-        private TileType[,] _gameTiles;        
+        private TileType[,] _gameTiles;
+        [SerializeField]
+        private int _maxScalableEdgeHeight = 2;
 
         [SerializeField]
         private LevelTileSet TileSet = new LevelTileSet();
 
+        public Vector2Int LevelSize { get { return new Vector2Int(_levelSizeX, _levelSizeY); } }
+
+        public TileType GetTile(int x, int y)
+        {
+            // Ensure x and y coordinates are valid            
+            if (x < 0 || x >= _levelSizeX) return TileType.Terrain; // throw new ArgumentException("Value must be less than horzontal level size", "x");
+            if (y < 0 || y >= _levelSizeY) return TileType.Terrain; // throw new ArgumentException("Value must be less than vertical level size", "y");
+
+            // Ensure there are tiles to use
+            if (_gameTiles == null) ResetTiles();
+
+            // Return tile
+            return _gameTiles[x, y];
+        }
         public void SetTile(int x, int y, TileType newType)
         {
             // Ensure x and y coordinates are valid
@@ -47,49 +59,67 @@ namespace Sierra.AGPW.TenSecondAscencion
             
             var halfWidth = _levelSizeX / 2f;
 
+            // Clear transform
+            for (int i = 0; i < _instanceParent.childCount; i++)
+            {
+                DestroyImmediate(_instanceParent.GetChild(i).gameObject);
+            }
+
             // Iterate through tiles and spawn relevant prefabs according to tileset rules
             for (int x = 0; x < _levelSizeX; x++)
             {
                 for (int y = 0; y < _levelSizeY; y++)
                 {
-                    switch (_gameTiles[x,y])
+                    switch (GetTile(x,y))
                     {
+                        /* !!!IMPORTANT!!!
+                         * This method/algorythm/ruleset - WHATEVER - is not optimized for ideal performance and contains bugs.
+                         * 
+                         * 1)   A scalable tile with air on both sides will generate as a double wall, even if one
+                         *      side is underneath a solid tile, creating a scalable wall where one shouldn't exist.
+                         *      
+                         * 2)   I'm 100% sure there's a more effecient iteration pattern than this.
+                         */
+
                         case TileType.Empty:
                             // Air: do nothing
                             break;
 
                         case TileType.Terrain:
                             // Empty above...
-                            if (_gameTiles[x, y + 1] == TileType.Empty)
+                            if (GetTile(x, y + 1) == TileType.Empty)
                             {
                                 // ... & Empty on both sides: spawn double corner tile
-                                if (_gameTiles[x - 1, y] == TileType.Empty && _gameTiles[x + 1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.DoubleCorner);
-
+                                if (GetTile(x - 1, y) == TileType.Empty && GetTile(x + 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.DoubleCorner);
+                                
                                 // ... & Empty to left: spawn left corner tile
-                                if (_gameTiles[x-1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.LeftCorner);
+                                else if(GetTile(x - 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.LeftCorner);
 
                                 // ... & Empty to right: spawn right corner tile
-                                else if (_gameTiles[x+1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y +0.5f, TileSet.RightCorner);
+                                else if (GetTile(x + 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.RightCorner);
 
                                 // ... : spawn ground tile
                                 else GenerateTile(x - halfWidth + 0.5f, y + +0.5f, TileSet.Ground);
                             }
 
-                            // Otherwise must be...
-                            else
+                            // Is scalable... (at most a certain number of tiles beneath a corner)
+                            else if (TileIsScalable(x, y))
                             {
                                 // ... & Empty on both sides: spawn double wall tile
-                                if (_gameTiles[x - 1, y] == TileType.Empty && _gameTiles[x + 1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.DoubleWall);
+                                if (GetTile(x - 1, y) == TileType.Empty && GetTile(x + 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.DoubleWall);
 
                                 // ... & Empty to left: spawn left wall tile
-                                if (_gameTiles[x - 1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.LeftWall);
+                                else if(GetTile(x - 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + 0.5f, TileSet.LeftWall);
 
                                 // ... & Empty to right: spawn right wall tile
-                                else if (_gameTiles[x + 1, y] == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + +0.5f, TileSet.RightWall);
+                                else if (GetTile(x + 1, y) == TileType.Empty) GenerateTile(x - halfWidth + 0.5f, y + +0.5f, TileSet.RightWall);
 
                                 // ... Surrounded or roof tile: spawn default tile
                                 else GenerateTile(x - halfWidth + 0.5f, y + +0.5f, TileSet.Wall);
                             }
+
+                            // Must be surrounded or non-scalable: spawn default tile
+                            else GenerateTile(x - halfWidth + 0.5f, y + +0.5f, TileSet.Wall);
 
                             break;
 
@@ -99,7 +129,47 @@ namespace Sierra.AGPW.TenSecondAscencion
                 }
             }
         }
+        public void ResetTiles()
+        {
+            _gameTiles = new TileType[_levelSizeX, _levelSizeY];
+            GenerateLevel();
+            GenerateLevel();
+            GenerateLevel();
+            GenerateLevel();
+        }
 
+        private bool TileIsScalable(int x, int y)
+        {
+            var cornerInRange = false;
+            var isScalable = false;
+            var distBelowCorner = 0;
+
+            // Iterate upwards and check each tile to see if it is a corner
+            for (int i = 1; i <= _maxScalableEdgeHeight; i++)
+            {
+                if (GetTile(x, y + i + 1) == TileType.Empty &&
+                    (GetTile(x - 1, y + i) == TileType.Empty || GetTile(x + 1, y + i) == TileType.Empty))
+                {
+                    cornerInRange = true;
+                    distBelowCorner = i;
+                    break;
+                }
+            }
+
+            if (cornerInRange)
+                // Iterate upwards and check each tile to see if it is a wall
+                for (int i = 1; i <= distBelowCorner; i++)
+                {
+                    if (GetTile(x - 1, y + i) == TileType.Empty || GetTile(x + 1, y + i) == TileType.Empty)
+                    {
+                        if (i == distBelowCorner) isScalable = true;
+                        else continue;
+                    }
+                    else break;
+                }
+
+            return isScalable;
+        }
         private void GenerateTile(float x, float y, GameObject tilePrefab)
         {
             Instantiate(
@@ -109,6 +179,7 @@ namespace Sierra.AGPW.TenSecondAscencion
                 _instanceParent
                 );
         }
+
     }
     [Serializable]
     public struct LevelTileSet

@@ -976,6 +976,7 @@ MonoBehaviour:
   _levelSizeX: 20
   _levelSizeY: 40
   _instanceParent: {fileID: 293330026}
+  _maxScalableEdgeHeight: 2
   TileSet:
     Wall: {fileID: 4059290770750385144, guid: af3ca6d82c586fb46872d41c161d4f25, type: 3}
     Ground: {fileID: 4537446564533784544, guid: cd3bde09a45bb0e4ba9a30c9cef1b038,
@@ -984,13 +985,13 @@ MonoBehaviour:
       type: 3}
     RightCorner: {fileID: 709613696613982936, guid: 19b8f9e25334193468d2f210b5c82e39,
       type: 3}
-    DoubleCorner: {fileID: 4762586299143216537, guid: 72b7fb436e1634a4bbf063aafd5186e2,
+    DoubleCorner: {fileID: 709613696613982936, guid: db9112376ea1cf4469c55e6f80d0c195,
       type: 3}
     LeftWall: {fileID: 6874021573946349366, guid: ca1be9040d88bd74388033f1003defa2,
       type: 3}
     RightWall: {fileID: 4962699759592399855, guid: 43d988f83380bf04b9b99d06831f7f2c,
       type: 3}
-    DoubleWall: {fileID: 4762586299143216537, guid: f121769c57bd05241a531c0f441c4f2a,
+    DoubleWall: {fileID: 4962699759592399855, guid: dba0178a6d08e204b82d4a334a122234,
       type: 3}
 --- !u!1 &1856645416
 GameObject:
