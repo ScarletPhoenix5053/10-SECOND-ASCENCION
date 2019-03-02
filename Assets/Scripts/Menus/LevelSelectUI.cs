@@ -5,10 +5,8 @@ public class LevelSelectUI : MonoBehaviour
 {
     #region Public Variables
     public int LevelCatalogLength = 0;
-    public int FurthestLevelIndex = 0;
 
     public LevelSelectButton ButtonPrefab;
-    public LevelSelectButton LockedButtonPrefab;
     public Transform ButtonContainer;
     #endregion
 
@@ -28,20 +26,13 @@ public class LevelSelectUI : MonoBehaviour
     {
         for (int i = 0; i < LevelCatalogLength; i++)
         {
-            if (i < FurthestLevelIndex)
-            {
-                InstantiateButton(ButtonPrefab, i);
-            }
-            else
-            {
-                InstantiateButton(LockedButtonPrefab, i);
-            }
+            InstantiateButton(ButtonPrefab, i);
         }
     }
     public void LevelButtonPressed(int levelIndex)
     {
         // change scene
-        SceneLoader.LoadScene(SceneName.LevelUntimedTest);
+        SceneLoader.LoadScene(SceneName.LevelHighscore);
     }
     #endregion
     #region Private Methods

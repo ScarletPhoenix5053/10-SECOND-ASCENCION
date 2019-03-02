@@ -9,7 +9,7 @@ public class MainMenuUI : MonoBehaviour
     }
     public void OnLevelSelectButtonPressed()
     {
-        SceneLoader.LoadScene(SceneName.MenuModeSelect);
+        SceneLoader.LoadScene(SceneName.MenuHighscoreLevelSelect);
     }
     public void OnSettingsButtonPressed()
     {

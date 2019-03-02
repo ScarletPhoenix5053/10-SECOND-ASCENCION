@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/MenuMain.unity
     guid: b7e68fb7b7556bb449b53941787a2ce9
   - enabled: 1
-    path: Assets/Scenes/MenuModeSelect.unity
+    path: Assets/Scenes/MenuHighscoreLevelSelect.unity
     guid: 36b422012de21444a82e38759ebf5cd4
   - enabled: 1
     path: Assets/Scenes/MenuGameOver.unity

@@ -293,9 +293,9 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 720, y: 960}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -355,11 +355,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84763a6f6ecd30d49bf414d97c959760, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelCatalogLength: 8
-  FurthestLevelIndex: 6
+  LevelCatalogLength: 1
   ButtonPrefab: {fileID: 7900751215263596318, guid: 22168244d3218b14a8c6a18deee5d9e6,
-    type: 3}
-  LockedButtonPrefab: {fileID: 2438288028256514309, guid: 07ca4afe6896fed4fbcd9d8b2883beca,
     type: 3}
   ButtonContainer: {fileID: 2078376602}
 --- !u!1 &824592203
@@ -581,12 +578,12 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 65
-    m_FontStyle: 1
+    m_Font: {fileID: 12800000, guid: cb020a5d2fa074a4eaadc74a3cc127ba, type: 3}
+    m_FontSize: 86
+    m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
-    m_MaxSize: 65
+    m_MaxSize: 109
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -724,8 +721,8 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 90, y: 90}
-  m_Spacing: {x: 10, y: 10}
+  m_CellSize: {x: 120, y: 120}
+  m_Spacing: {x: 20, y: 20}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1001 &2117646802
