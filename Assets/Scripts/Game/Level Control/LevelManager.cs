@@ -19,7 +19,6 @@ namespace Sierra.AGPW.TenSecondAscencion
         private Text _scoreDisplay;
         [SerializeField]
         private string _scoreText = "SCORE: ";
-        [ReadOnly]
         private int _score = 0;
         #endregion
         #region Events
@@ -78,7 +77,7 @@ namespace Sierra.AGPW.TenSecondAscencion
         #region Private Methods
         protected void SetupLevel()
         {
-            Player1.transform.position = new Vector3(Player1Pos.x, Player1.transform.position.y, Player1Pos.z);
+            //Player1.transform.position = new Vector3(Player1Pos.x, Player1.transform.position.y, Player1Pos.z);
         }
         protected void UnsubscribeFromEvents(int score)
         {

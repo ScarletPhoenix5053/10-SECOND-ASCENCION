@@ -13,6 +13,8 @@ namespace Sierra.AGPW.TenSecondAscencion
         {
             CheckIfSingleton();
 
+            Screen.SetResolution(720, 960, false);
+
             LevelManager.OnLevelEnd += OnLevelEnd;
             SceneManager.sceneLoaded += OnSceneLoad;
         }

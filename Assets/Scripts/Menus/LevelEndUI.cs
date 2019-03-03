@@ -21,7 +21,7 @@ namespace Sierra.AGPW.TenSecondAscencion
 
         public void OnRetstartButtonPressed()
         {
-            SceneLoader.LoadScene(SceneName.LevelUntimedTest);
+            SceneLoader.LoadScene(SceneName.LevelHighscore);
         }
         public void OnMenuButtonPressed()
         {

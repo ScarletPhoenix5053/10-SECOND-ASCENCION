@@ -29,7 +29,6 @@ namespace Sierra.AGPW.TenSecondAscencion
         [SerializeField]
         private float _timeLimit = 10f;
         [SerializeField]
-        [ReadOnly]
         private float _timeRemaining;
         [SerializeField]
         private Text _timeDisplay;

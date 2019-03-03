@@ -1922,8 +1922,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player1: {fileID: 691805802}
   Player1ControllerIndex: 1
+  Player1Left: 97
+  Player1Right: 100
+  Player1Jump: 119
+  Player1Throw: 115
   Player2: {fileID: 312312688}
-  Player2ControllerIndex: 3
+  Player2ControllerIndex: 2
+  Player2Left: 276
+  Player2Right: 275
+  Player2Jump: 273
+  Player2Throw: 274
 --- !u!1001 &975801294
 PrefabInstance:
   m_ObjectHideFlags: 0
