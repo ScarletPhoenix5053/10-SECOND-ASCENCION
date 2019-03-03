@@ -230,7 +230,11 @@ namespace Sierra.AGPW.TenSecondAscencion
                     DoMotionJump();
 
                     if (_holdingPlayer) DoThrow();
-                    else DoGrab();
+                    else
+                    {
+                        DoGrab();
+                        DoZip();
+                    }
 
                     // Apply motion
                     UpdatePosition();
@@ -264,6 +268,8 @@ namespace Sierra.AGPW.TenSecondAscencion
                     break;
                     
                 case PlayerState.Held:
+                    // Allow player to detatch themselves when held or on a zipline
+                    DoBreak();
                     break;
 
                 default:
@@ -309,15 +315,18 @@ namespace Sierra.AGPW.TenSecondAscencion
 
         private GrabBox _grabBox;
         private PlayerController _heldPlayer;
+        private PlayerController _hostPlayer;
         private Transform _carryPos;
+        private Zipline _activeZipline;
 
         [SerializeField]
-        private Vector2 _launchTrajectory = new Vector2(35f, 40f);
+        private Vector2 _launchTrajectory = new Vector2(35f, 40f);        
         #endregion
         #region MECHANIC METHODS
-        public void Hold()
+        public void Hold(PlayerController host)
         {
             _state = PlayerState.Held;
+            _hostPlayer = host;
         }
         public void Launch(Vector2 trajectory)
         {
@@ -326,6 +335,11 @@ namespace Sierra.AGPW.TenSecondAscencion
 
             _motionVectorCont = trajectory;
         }
+        public void DetatchHeldPlayer()
+        {
+            _holdingPlayer = false;
+            _heldPlayer = null;
+        }
         public void TriggerWallTouch(int dir)
         {
             _state = PlayerState.Climbing;
@@ -333,9 +347,43 @@ namespace Sierra.AGPW.TenSecondAscencion
             if (dir != 0) _wallDir = Mathf.Clamp(dir, -1, 1);
         }
 
+        private void DoBreak()
+        {
+            if (_inputThrow)
+            {
+                // Reset buddy if breaking from being held
+                if (_hostPlayer != null)
+                {
+                    _hostPlayer.DetatchHeldPlayer();
+                    _hostPlayer = null;
+                }
+
+                // Detatch from zipline if breaking from zipL
+                if (_activeZipline != null)
+                {
+                    _activeZipline.DetatchPlayer(this);
+                    _activeZipline = null;
+                }
+
+                // Revert state
+                _state = PlayerState.Normal;
+            }
+        }
+        private void DoGrab()
+        {
+            if (_inputThrow)
+            {
+                var otherPlayer = _grabBox.GrabPlayer();
+                if (otherPlayer == null) return;
+
+                otherPlayer.Hold(this);
+                _heldPlayer = otherPlayer;
+                _holdingPlayer = true;
+            }
+        }
         private void DoMotionClimb()
         {
-            if (_touchingWall && 
+            if (_touchingWall &&
                 (
                 _wallDir == -1 && _inputHor <= -0.3f ||
                 _wallDir == 1 && _inputHor >= 0.3f
@@ -348,18 +396,6 @@ namespace Sierra.AGPW.TenSecondAscencion
                 // revert to normal state if not touching or not inputting
                 _state = PlayerState.Normal;
                 _gravityEnabled = true;
-            }
-        }
-        private void DoGrab()
-        {
-            if (_inputThrow)
-            {
-                var otherPlayer = _grabBox.GrabPlayer();
-                if (otherPlayer == null) return;
-
-                otherPlayer.Hold();
-                _heldPlayer = otherPlayer;
-                _holdingPlayer = true;
             }
         }
         private void DoThrow()
@@ -375,6 +411,22 @@ namespace Sierra.AGPW.TenSecondAscencion
                         ));
                 _holdingPlayer = false;
                 _heldPlayer = null;
+            }
+        }
+        private void DoZip()
+        {
+            if (_inputThrow && !_holdingPlayer)
+            {
+                var zipline = _grabBox.GrabZipline();
+                if (zipline == null) return;
+
+                zipline.AttatchPlayer(this);
+                _state = PlayerState.Held;
+                _activeZipline = zipline;
+
+                // Stop all motion when attatching
+                _motionVectorInput = Vector2.zero;
+                _motionVectorCont = Vector2.zero;
             }
         }
         private void UpdateHeldPlayerPos()

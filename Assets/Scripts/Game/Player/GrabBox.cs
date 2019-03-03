@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Sierra.AGPW.TenSecondAscencion
 {
@@ -30,8 +28,7 @@ namespace Sierra.AGPW.TenSecondAscencion
         {
             // Boxcast and check all matches for a player controller
             var parentPlayer = GetComponentInParent<PlayerController>();
-            var objects =
-                Physics2D.OverlapBoxAll(transform.position, Size, 0);
+            var objects = Physics2D.OverlapBoxAll(transform.position, Size, 0);
             foreach (Collider2D obj in objects)
             {
                 var foundPlayer = obj.GetComponent<PlayerController>();
@@ -40,6 +37,25 @@ namespace Sierra.AGPW.TenSecondAscencion
                     // return the first playercontroller found that is not the parent
                     if (parentPlayer == foundPlayer) continue;
                     return foundPlayer;
+                }
+            }
+
+            // return null if nothing is found
+            return null;
+        }
+        public Zipline GrabZipline()
+        {
+            // Boxcast and check all matches for a zipline
+            var parentPlayer = GetComponentInParent<PlayerController>();
+            var objects = Physics2D.OverlapBoxAll(transform.position, Size, 0);
+            foreach (Collider2D obj in objects)
+            {
+                var foundZipline = obj.GetComponent<Zipline>();
+                if (foundZipline != null)
+                {
+                    // return the first zipline found that is not the parent
+                    if (parentPlayer == foundZipline) continue;
+                    return foundZipline;
                 }
             }
 
